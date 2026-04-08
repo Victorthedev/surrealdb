@@ -96,7 +96,6 @@ impl Document {
 					}
 					let Ok(Error::RecordExists {
 						record: thing,
-						..
 					}) = e.downcast()
 					else {
 						// Checked above
