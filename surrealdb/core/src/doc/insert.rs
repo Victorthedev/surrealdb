@@ -96,6 +96,7 @@ impl Document {
 					}
 					let Ok(Error::RecordExists {
 						record: thing,
+						..
 					}) = e.downcast()
 					else {
 						// Checked above
@@ -163,7 +164,6 @@ impl Document {
 		self.process_table_fields(stk, ctx, opt, stm).await?;
 		self.cleanup_table_fields(ctx, opt, stm).await?;
 		self.check_permissions_table(stk, ctx, opt, stm).await?;
-		self.process_table_references(stk, ctx, opt).await?;
 		self.store_index_data(stk, ctx, opt).await?;
 		self.store_record_data(ctx, opt, stm).await?;
 		self.process_table_views(stk, ctx, opt, stm).await?;
@@ -190,7 +190,6 @@ impl Document {
 		self.process_table_fields(stk, ctx, opt, stm).await?;
 		self.cleanup_table_fields(ctx, opt, stm).await?;
 		self.check_permissions_table(stk, ctx, opt, stm).await?;
-		self.process_table_references(stk, ctx, opt).await?;
 		self.store_index_data(stk, ctx, opt).await?;
 		self.store_record_data(ctx, opt, stm).await?;
 		self.process_table_views(stk, ctx, opt, stm).await?;
