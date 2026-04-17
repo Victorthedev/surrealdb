@@ -396,55 +396,6 @@ impl Document {
 
 	/// Processes `DEFINE FIELD` statements which
 	/// have been defined on the table for this
-	/// record, with a `REFERENCE` clause, and writes
-	/// all references this record has made. This is
-	/// called after permissions checks to ensure that
-	/// references are not written if the operation
-	/// is not permitted.
-	pub(super) async fn process_table_references(
-		&mut self,
-		stk: &mut Stk,
-		ctx: &FrozenContext,
-		opt: &Options,
-	) -> Result<()> {
-		// Check import
-		if opt.import {
-			return Ok(());
-		}
-		// Get the record id
-		let rid = self.id()?;
-		// Loop through all field statements
-		for fd in self.fd(ctx, opt).await?.iter() {
-			// Only process reference fields
-			if fd.reference.is_none() {
-				continue;
-			}
-			// Limit auth
-			let opt = AuthLimit::try_from(&fd.auth_limit)?.limit_opt(opt);
-			// Loop over each field in document
-			for (k, val) in self.current.doc.as_ref().walk(&fd.name) {
-				// Get the initial value
-				let old = Arc::new(self.initial.doc.as_ref().pick(&k));
-				// Prepare the field edit context
-				let mut field = FieldEditContext {
-					context: None,
-					doc: self,
-					rid: rid.clone(),
-					def: fd,
-					stk,
-					ctx,
-					opt: &opt,
-					old,
-					user_input: Value::None.into(),
-				};
-				// Write the reference
-				field.process_reference_clause(&val).await?;
-			}
-		}
-		Ok(())
-	}
-	/// Processes `DEFINE FIELD` statements which
-	/// have been defined on the table for this
 	/// record, with a `REFERENCE` clause, and remove
 	/// all possible references this record has made.
 	pub(super) async fn cleanup_table_references(
